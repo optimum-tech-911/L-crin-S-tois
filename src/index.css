@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* L’Écrin Sétois brand gold — derived from the emblem’s sun and horizon line.
+   Existing accent utilities resolve through this palette so the whole product
+   keeps one consistent warm, Mediterranean identity. */
+@theme {
+  --color-gold-50: #fffaf0;
+  --color-gold-100: #fdf2d8;
+  --color-gold-200: #f8dfaa;
+  --color-gold-300: #f0c978;
+  --color-gold-400: #e4b452;
+  --color-gold-500: #d29a32;
+  --color-gold-600: #b77d20;
+  --color-gold-700: #926119;
+  --color-gold-800: #704a14;
+  --color-gold-900: #50340f;
+  --color-gold-950: #2f1e09;
+
+  /* Legacy orange utility names now render in the branded gold palette. */
+  --color-orange-50: var(--color-gold-50);
+  --color-orange-100: var(--color-gold-100);
+  --color-orange-200: var(--color-gold-200);
+  --color-orange-300: var(--color-gold-300);
+  --color-orange-400: var(--color-gold-400);
+  --color-orange-500: var(--color-gold-500);
+  --color-orange-600: var(--color-gold-600);
+  --color-orange-700: var(--color-gold-700);
+  --color-orange-800: var(--color-gold-800);
+  --color-orange-900: var(--color-gold-900);
+  --color-orange-950: var(--color-gold-950);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+}
+
+/* Slow, nearly imperceptible motion makes editorial imagery feel inhabited. */
+@keyframes ken-burns {
+  0% { transform: scale(1.015) translate3d(0, 0, 0); }
+  100% { transform: scale(1.09) translate3d(-1.2%, -0.7%, 0); }
+}
+
+@keyframes faq-reveal {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-ken-burns { animation: ken-burns 16s ease-in-out infinite alternate; }
+.faq-content { animation: faq-reveal 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns,
+  .faq-content { animation: none; }
+}
+
+/* Custom scrollbar for an elegant feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #fafaf9; /* stone-50 */
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1; /* stone-300 */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e; /* stone-400 */
+}

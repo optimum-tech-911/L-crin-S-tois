@@ -1,0 +1,6 @@
+{
+  "name": "L’Écrin Sétois",
+  "description": "Appartement de vacances premium à Sète. Profitez d'un séjour exceptionnel avec vue sur la Méditerranée.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

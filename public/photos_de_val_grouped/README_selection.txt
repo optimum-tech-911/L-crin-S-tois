@@ -1,0 +1,36 @@
+USABLE IMAGE GROUPS FOR WEBSITE
+
+01_HERO
+- 2B4E922F-7188-4A64-9EBA-DF40F69F3842.png
+- IMG_5263.jpeg
+
+02_LIVING_DINING
+- IMG_5264.jpeg
+- IMG_5328.jpeg
+
+03_BEDROOM
+- IMG_5313.jpeg
+- IMG_5322.jpeg
+
+04_BATHROOM
+- IMG_5277 2.jpeg
+- IMG_5281.jpeg
+
+05_KITCHEN
+- IMG_5303 2.jpeg
+
+06_BALCONY
+- IMG_5250 2.jpeg
+
+07_SETE_DESTINATION
+- IMG_2815.jpeg
+- IMG_0357.JPG
+
+08_OPTIONAL_BACKUPS
+- IMG_5254.jpeg
+- IMG_5268.jpeg
+- IMG_5299.jpeg
+- IMG_5285.jpeg
+
+Recommended core set: folders 01 to 07.
+Folder 08 contains usable backups/alternates.
