@@ -15,8 +15,8 @@ export const cityMoments: CityMoment[] = [
     eyebrow: 'Le matin',
     title: 'Commencer par les canaux.',
     description: 'À Sète, l’eau n’est jamais loin. Depuis les quais, regardez la ville se réveiller, traversez les ponts et laissez la promenade décider de la suite.',
-    image: '/optimized-images/sete-canal-dusk.jpg',
-    imageAlt: 'Canal de Sète bordé de maisons et de bateaux',
+    image: '/new-images/07-destination/IMG_8185.jpg',
+    imageAlt: 'Façades sétoises et barque sur le canal',
     link: 'https://www.tourisme-sete.com/',
     linkLabel: 'Préparer la promenade',
   },
@@ -25,8 +25,8 @@ export const cityMoments: CityMoment[] = [
     eyebrow: 'Le midi',
     title: 'Goûter Sète aux Halles.',
     description: 'Poissons, coquillages, tielles et producteurs locaux : les Halles sont une excellente porte d’entrée vers la cuisine sétoise. Arrivez tôt pour l’ambiance la plus vivante.',
-    image: '/optimized-images/sete-port.jpg',
-    imageAlt: 'Port et façades de Sète au bord de l’eau',
+    image: '/new-images/07-destination/IMG_2057.jpg',
+    imageAlt: 'Navette fluviale entre Sète et Mèze sur le canal',
     link: 'https://en.tourisme-sete.com/halles-de-sete-sete.html',
     linkLabel: 'Voir les informations des Halles',
   },
@@ -54,6 +54,5 @@ export const cityMoments: CityMoment[] = [
 
 export const destinationPhotoCredits = [
   { label: 'Panorama du mont Saint-Clair', href: 'https://commons.wikimedia.org/wiki/File:Panoramique_sur_S%C3%A8te_depuis_le_Mont_Saint-Clair_(%C3%A9t%C3%A9_2018).JPG', author: 'Florian Pépellin, CC BY-SA 4.0' },
-  { label: 'Canal de Sète au crépuscule', href: 'https://commons.wikimedia.org/wiki/File:Canal_of_S%C3%A8te_at_dusk_cf01.jpg', author: 'Christian Ferrer, CC BY-SA 4.0' },
   { label: 'Sète depuis le Lido', href: 'https://commons.wikimedia.org/wiki/File:S%C3%A8te_from_the_Lido.jpg', author: 'Christian Ferrer, CC BY-SA 4.0' },
 ];

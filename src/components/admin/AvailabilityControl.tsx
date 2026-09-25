@@ -32,6 +32,7 @@ export default function AvailabilityControl() {
   const [isLoading, setIsLoading] = useState(true);
   const [updatingDate, setUpdatingDate] = useState<string | null>(null);
   const [minimumNights, setMinimumNights] = useState(2);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const months = useMemo(() => [currentMonth, addMonths(currentMonth, 1)], [currentMonth]);
 
@@ -40,14 +41,18 @@ export default function AvailabilityControl() {
     const refresh = async () => {
       const start = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 1 });
       const end = endOfWeek(endOfMonth(addMonths(currentMonth, 1)), { weekStartsOn: 1 });
-      const [nextAvailability, nextRanges] = await Promise.all([
-        calendarService.getAvailability(start, end),
-        calendarService.getRanges(),
-      ]);
+      try {
+      const [nextAvailability, nextRanges] = await Promise.all([calendarService.getAvailability(start, end), calendarService.getRanges()]);
       if (!active) return;
       setAvailability(nextAvailability);
       setRanges(nextRanges);
+      setErrorMessage('');
       setIsLoading(false);
+      } catch (error) {
+        if (!active) return;
+        setErrorMessage(error instanceof Error ? error.message : 'Impossible de charger le calendrier.');
+        setIsLoading(false);
+      }
     };
 
     setIsLoading(true);
@@ -60,15 +65,18 @@ export default function AvailabilityControl() {
   }, [currentMonth]);
 
   useEffect(() => {
-    const refresh = () => bookingSettingsService.getSettings().then((settings) => setMinimumNights(settings.minimumNights));
+    const refresh = () => bookingSettingsService.getSettings().then((settings) => setMinimumNights(settings.minimumNights)).catch((error: unknown) => setErrorMessage(error instanceof Error ? error.message : 'Impossible de charger les règles de réservation.'));
     void refresh();
     return bookingSettingsService.subscribe(refresh);
   }, []);
 
-  const updateMinimumNights = (value: number) => {
+  const updateMinimumNights = async (value: number) => {
     const normalized = Math.min(30, Math.max(1, Math.round(value)));
-    setMinimumNights(normalized);
-    void bookingSettingsService.setMinimumNights(normalized);
+    setErrorMessage('');
+    try {
+      await bookingSettingsService.setMinimumNights(normalized);
+      setMinimumNights(normalized);
+    } catch (error) { setErrorMessage(error instanceof Error ? error.message : 'Impossible d’enregistrer le séjour minimum.'); }
   };
 
   const updateDay = async (day: Date) => {
@@ -78,8 +86,9 @@ export default function AvailabilityControl() {
     if ((mode === 'available' && currentStatus === 'available') || (mode === 'blocked' && currentStatus === 'blocked')) return;
 
     setUpdatingDate(key);
-    await calendarService.setDateAvailability(day, mode);
-    setUpdatingDate(null);
+    try { await calendarService.setDateAvailability(day, mode); }
+    catch (error) { setErrorMessage(error instanceof Error ? error.message : 'Impossible de modifier cette date.'); }
+    finally { setUpdatingDate(null); }
   };
 
   const renderMonth = (month: Date, isSecondMonth: boolean) => {
@@ -107,7 +116,7 @@ export default function AvailabilityControl() {
             return <div key={key} className="flex h-12 items-center justify-center sm:h-14">
               <button
                 type="button"
-                disabled={!inMonth || isPast || isBusy || Boolean(updatingDate)}
+                disabled={!inMonth || isPast || isBusy || Boolean(updatingDate) || Boolean(errorMessage)}
                 onClick={() => void updateDay(day)}
                 aria-label={`${format(day, 'EEEE d MMMM yyyy', { locale: fr })} — ${isAvailable ? 'disponible' : status === 'pending' ? 'en attente' : 'indisponible'}`}
                 className={clsx(
@@ -132,6 +141,7 @@ export default function AvailabilityControl() {
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
+      {errorMessage && <p role="alert" className="border border-red-200 bg-red-50 p-4 text-sm text-red-800 xl:col-span-2">{errorMessage} Le calendrier reste en lecture seule tant que la connexion n’est pas rétablie.</p>}
       <section className="overflow-hidden border border-stone-200 bg-white shadow-sm">
         <div className="border-b border-stone-200 bg-[linear-gradient(115deg,rgba(255,255,255,1),rgba(236,253,245,0.72),rgba(255,255,255,1))] p-4 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

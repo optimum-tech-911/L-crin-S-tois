@@ -34,6 +34,12 @@ export default function Home() {
             name: propertyData.name,
             url: siteData.url,
             inLanguage: 'fr-FR',
+            publisher: {
+              '@type': 'Organization',
+              name: propertyData.name,
+              url: siteData.url,
+              logo: { '@type': 'ImageObject', url: `${siteData.url}/brand/mark.png?v=2` },
+            },
           },
           {
             '@context': 'https://schema.org',
@@ -139,7 +145,7 @@ export default function Home() {
                <div><p className="text-xs font-bold uppercase tracking-[0.2em] text-gold-700">En quelques mots</p><h2 className="mt-3 font-serif text-3xl text-stone-900" itemProp="name">L’Écrin Sétois</h2></div>
                <div className="grid grid-cols-2 border-y border-stone-200 sm:grid-cols-3 md:grid-cols-5">
                  {propertyFacts.map((fact, index) => (
-                   <motion.div key={fact.label} whileHover={{ y: -4, backgroundColor: 'rgba(248, 223, 170, 0.28)' }} transition={{ duration: 0.25 }} className="group min-w-0 border-r border-stone-200 px-3 py-5 last:border-r-0 sm:px-4 md:py-6">
+                   <motion.div key={fact.label} whileHover={{ y: -4, backgroundColor: 'rgba(176, 202, 223, 0.28)' }} transition={{ duration: 0.25 }} className="group min-w-0 border-r border-stone-200 px-3 py-5 last:border-r-0 sm:px-4 md:py-6">
                      <span className="block text-[10px] font-bold uppercase tracking-[0.13em] text-stone-400 transition-colors group-hover:text-gold-700">{fact.label}</span>
                      <span className="mt-2 block truncate font-serif text-base text-stone-900" itemProp={index === 0 ? 'address' : undefined}>{fact.value}</span>
                    </motion.div>

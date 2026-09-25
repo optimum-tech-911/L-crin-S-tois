@@ -19,10 +19,7 @@ import Legal from './pages/Legal';
 
 import Game from './pages/Game';
 
-// The local back office intentionally never ships in the public production app.
-// Supabase authentication will replace this development-only gate.
-const isLocalDevelopment = typeof import.meta !== 'undefined' && Boolean(import.meta.env?.DEV);
-const LocalAdmin = isLocalDevelopment ? lazy(() => import('./pages/Admin')) : null;
+const Admin = lazy(() => import('./pages/Admin'));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -39,7 +36,7 @@ export function AppRoutes() {
   
   return (
     <Routes>
-      {LocalAdmin && <Route path="/admin" element={<Suspense fallback={null}><LocalAdmin /></Suspense>} />}
+      <Route path="/admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="appartement" element={<Apartment />} />

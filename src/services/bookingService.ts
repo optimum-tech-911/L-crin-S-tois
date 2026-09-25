@@ -1,6 +1,5 @@
-import { differenceInCalendarDays } from 'date-fns';
-import { bookingSettingsService } from './bookingSettingsService';
-import { calendarService } from './calendarService';
+import { format } from 'date-fns';
+import { isSupabaseConfigured, requireSupabase } from '../lib/supabase';
 
 export interface BookingRequest {
   checkIn: Date;
@@ -24,53 +23,61 @@ export interface StoredBookingRequest extends Omit<BookingRequest, 'checkIn' | '
   status: BookingRequestStatus;
 }
 
+type BookingRow = {
+  id: string; check_in: string; check_out: string; guests: number; first_name: string;
+  last_name: string; email: string; phone: string; country: string; message: string | null;
+  created_at: string; status: BookingRequestStatus;
+};
+
+const fromRow = (row: BookingRow): StoredBookingRequest => ({
+  id: row.id, checkIn: row.check_in, checkOut: row.check_out, guests: row.guests,
+  firstName: row.first_name, lastName: row.last_name, email: row.email, phone: row.phone,
+  country: row.country, message: row.message ?? undefined, createdAt: row.created_at, status: row.status,
+});
+
+/** Supabase-backed booking request flow. Availability is validated atomically by the database RPC. */
 export class BookingService {
-  private readonly storageKey = 'ecrin-setois:reservation-requests';
+  private listeners = new Set<() => void>();
+  private channel: ReturnType<ReturnType<typeof requireSupabase>['channel']> | null = null;
 
   async submitReservationRequest(request: BookingRequest): Promise<{ success: boolean; message: string; id: string }> {
-    const settings = await bookingSettingsService.getSettings();
-    const nights = differenceInCalendarDays(request.checkOut, request.checkIn);
-    if (nights < settings.minimumNights) {
-      return { success: false, message: `Le séjour minimum est de ${settings.minimumNights} nuits.`, id: '' };
-    }
-    if (!(await calendarService.isRangeAvailable(request.checkIn, request.checkOut))) {
-      return { success: false, message: 'Ces dates ne sont plus entièrement disponibles. Veuillez consulter le calendrier.', id: '' };
-    }
-
-    const booking: StoredBookingRequest = {
-      ...request,
-      id: crypto.randomUUID(),
-      checkIn: request.checkIn.toISOString(),
-      checkOut: request.checkOut.toISOString(),
-      createdAt: new Date().toISOString(),
-      status: 'new',
-    };
-    this.write([booking, ...this.read()]);
-
-    return { success: true, message: 'Votre demande a bien été enregistrée.', id: booking.id };
+    const { data, error } = await requireSupabase().rpc('submit_reservation_request', {
+      p_check_in: format(request.checkIn, 'yyyy-MM-dd'), p_check_out: format(request.checkOut, 'yyyy-MM-dd'),
+      p_guests: request.guests, p_first_name: request.firstName.trim(), p_last_name: request.lastName.trim(),
+      p_email: request.email.trim(), p_phone: request.phone.trim(), p_country: request.country.trim(),
+      p_message: request.message?.trim() || null,
+    });
+    if (error) return { success: false, message: error.message || 'Votre demande n’a pas pu être envoyée. Réessayez dans un instant.', id: '' };
+    return { success: true, message: 'Votre demande a bien été enregistrée.', id: data as string };
   }
 
   async getReservationRequests(): Promise<StoredBookingRequest[]> {
-    return this.read();
+    const { data, error } = await requireSupabase().from('reservation_requests').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return ((data ?? []) as BookingRow[]).map(fromRow);
   }
 
   async updateReservationStatus(id: string, status: BookingRequestStatus): Promise<void> {
-    this.write(this.read().map((booking) => booking.id === id ? { ...booking, status } : booking));
+    const { error } = await requireSupabase().rpc('admin_update_reservation_status', { p_id: id, p_status: status });
+    if (error) throw error;
+    this.notify();
   }
 
-  private read(): StoredBookingRequest[] {
-    if (typeof window === 'undefined') return [];
-    try {
-      const value = window.localStorage.getItem(this.storageKey);
-      return value ? JSON.parse(value) as StoredBookingRequest[] : [];
-    } catch {
-      return [];
-    }
+  subscribe(listener: () => void): () => void {
+    if (!isSupabaseConfigured) return () => undefined;
+    this.listeners.add(listener);
+    if (!this.channel) this.channel = requireSupabase().channel('reservation-requests-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservation_requests' }, () => this.notify()).subscribe();
+    return () => {
+      this.listeners.delete(listener);
+      if (!this.listeners.size && this.channel) {
+        void requireSupabase().removeChannel(this.channel);
+        this.channel = null;
+      }
+    };
   }
 
-  private write(bookings: StoredBookingRequest[]) {
-    if (typeof window !== 'undefined') window.localStorage.setItem(this.storageKey, JSON.stringify(bookings));
-  }
+  private notify() { this.listeners.forEach((listener) => listener()); }
 }
 
 export const bookingService = new BookingService();

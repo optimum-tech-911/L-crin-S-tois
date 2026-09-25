@@ -92,7 +92,7 @@ export default function Header() {
           isScrolled ? "h-16" : "h-24"
         )}>
           <Link to="/" className={clsx("flex items-center gap-3 text-2xl font-serif font-semibold tracking-wide uppercase transition-colors duration-300", isMenuOpen ? "text-stone-900" : textColor)}>
-            <img src="/brand/mark.png" alt="" className="h-10 w-10 rounded-full bg-stone-50 object-contain p-0.5 shadow-sm" />
+            <img src="/brand/mark.png?v=2" alt="" className="h-10 w-10 rounded-full bg-stone-50 object-contain p-0.5 shadow-sm" />
             <span>{propertyData.shortName}</span>
           </Link>
 

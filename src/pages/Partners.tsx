@@ -12,7 +12,7 @@ export default function Partners() {
 
   useEffect(() => {
     let active = true;
-    const refresh = () => partnerService.getPartners().then((items) => active && setPartners(items));
+    const refresh = () => partnerService.getPartners().then((items) => active && setPartners(items)).catch(() => active && setPartners(partnersData));
     void refresh();
     const unsubscribe = partnerService.subscribe(refresh);
     return () => { active = false; unsubscribe(); };
@@ -29,7 +29,7 @@ export default function Partners() {
           <FadeIn>
             <span className="mb-6 block text-sm font-bold uppercase tracking-[0.18em] text-gold-700">Nos bonnes adresses</span>
             <h1 className="font-serif text-4xl leading-tight text-stone-950 md:text-6xl">Des rencontres locales,<br className="hidden md:block" /> <span className="font-light italic text-gold-800">un accueil plus personnel.</span></h1>
-            <p className="mt-7 max-w-2xl text-lg font-light leading-relaxed text-stone-600 md:text-xl">Nous partageons ici les commerçants que nous connaissons et les avantages qu’ils proposent aux voyageurs de L’Écrin Sétois.</p>
+            <p className="mt-7 max-w-2xl text-lg font-light leading-relaxed text-stone-600 md:text-xl">Des commerces de quartier aux lieux culturels, retrouvez nos adresses partenaires et les informations utiles pour profiter de votre séjour à Sète.</p>
           </FadeIn>
         </div>
       </section>
@@ -54,7 +54,7 @@ export default function Partners() {
               </FadeIn>
             ))}
           </div> : <FadeIn><div className="border border-dashed border-stone-300 p-10 text-center text-stone-500">Les prochaines adresses partenaires seront ajoutées ici.</div></FadeIn>}
-          <p className="mt-8 text-xs leading-relaxed text-stone-500">Les avantages sont proposés par les partenaires selon leurs conditions et peuvent évoluer. Pensez à préciser que vous séjournez à L’Écrin Sétois.</p>
+          <p className="mt-8 text-xs leading-relaxed text-stone-500">Les éventuelles offres commerciales sont proposées par les partenaires selon leurs conditions et peuvent évoluer. Pensez à préciser que vous séjournez à L’Écrin Sétois.</p>
         </div>
       </section>
     </>

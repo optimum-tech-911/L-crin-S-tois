@@ -20,8 +20,9 @@ export default function PartnersControl() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const refresh = () => partnerService.getPartners().then(setPartners);
+  const refresh = () => partnerService.getPartners().then(setPartners).catch((error: unknown) => setErrorMessage(error instanceof Error ? error.message : 'Impossible de charger les partenaires.'));
 
   useEffect(() => {
     void refresh();
@@ -61,18 +62,22 @@ export default function PartnersControl() {
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSaving(true);
-    if (editingId) await partnerService.updatePartner(editingId, draft);
-    else await partnerService.createPartner(draft);
-    setIsSaving(false);
-    setSaved(true);
-    if (!editingId) setDraft(emptyDraft);
-    window.setTimeout(() => setSaved(false), 1800);
+    setErrorMessage('');
+    try {
+      if (editingId) await partnerService.updatePartner(editingId, draft);
+      else await partnerService.createPartner(draft);
+      setSaved(true);
+      if (!editingId) setDraft(emptyDraft);
+      window.setTimeout(() => setSaved(false), 1800);
+    } catch (error) { setErrorMessage(error instanceof Error ? error.message : 'Impossible d’enregistrer ce partenaire.'); }
+    finally { setIsSaving(false); }
   };
 
   const remove = async (partner: Partner) => {
     if (!window.confirm(`Supprimer ${partner.name} des partenaires ?`)) return;
-    await partnerService.removePartner(partner.id);
-    if (editingId === partner.id) reset();
+    setErrorMessage('');
+    try { await partnerService.removePartner(partner.id); if (editingId === partner.id) reset(); }
+    catch (error) { setErrorMessage(error instanceof Error ? error.message : 'Impossible de supprimer ce partenaire.'); }
   };
 
   return (
@@ -83,6 +88,7 @@ export default function PartnersControl() {
           {editingId && <button type="button" onClick={reset} className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:border-stone-400" aria-label="Annuler la modification"><X size={18} /></button>}
         </div>
         <p className="mt-2 text-sm leading-relaxed text-stone-500">Les changements apparaissent immédiatement sur la page publique Partenaires.</p>
+        {errorMessage && <p role="alert" className="mt-4 border border-red-200 bg-red-50 p-3 text-sm text-red-800">{errorMessage}</p>}
         <form onSubmit={save} className="mt-6 space-y-4">
           <Field label="Nom" required value={draft.name} onChange={(value) => setField('name', value)} placeholder="Ex. Caveau Voltaire" />
           <Field label="Catégorie" required value={draft.category} onChange={(value) => setField('category', value)} placeholder="Ex. Vins locaux" />

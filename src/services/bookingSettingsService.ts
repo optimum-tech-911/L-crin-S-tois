@@ -1,63 +1,58 @@
+import { isSupabaseConfigured, requireSupabase } from '../lib/supabase';
+
 export interface BookingSettings {
   minimumNights: number;
 }
 
 const DEFAULT_SETTINGS: BookingSettings = { minimumNights: 2 };
 
-/**
- * Local booking-rules repository. Its small contract is intentionally ready to
- * be backed by a Supabase settings row without changing the calendar screens.
- */
+/** Supabase-backed public booking rules, editable by an authenticated admin. */
 export class BookingSettingsService {
-  private settings: BookingSettings;
+  private settings: BookingSettings = DEFAULT_SETTINGS;
   private listeners = new Set<() => void>();
-  private readonly storageKey = 'ecrin-setois:booking-settings';
-
-  constructor() {
-    this.settings = this.read() ?? DEFAULT_SETTINGS;
-    if (typeof window !== 'undefined') window.addEventListener('storage', this.handleStorage);
-  }
+  private channel: ReturnType<ReturnType<typeof requireSupabase>['channel']> | null = null;
 
   async getSettings(): Promise<BookingSettings> {
+    const { data, error } = await requireSupabase()
+      .from('booking_settings')
+      .select('minimum_nights')
+      .eq('id', 1)
+      .single();
+    if (error) throw error;
+    this.settings = { minimumNights: data.minimum_nights };
     return { ...this.settings };
   }
 
   async setMinimumNights(minimumNights: number): Promise<void> {
     const normalized = Math.min(30, Math.max(1, Math.round(minimumNights)));
-    this.settings = { ...this.settings, minimumNights: normalized };
-    this.persist();
+    const { error } = await requireSupabase().from('booking_settings').update({ minimum_nights: normalized, updated_at: new Date().toISOString() }).eq('id', 1);
+    if (error) throw error;
+    this.settings = { minimumNights: normalized };
+    this.notify();
   }
 
   subscribe(listener: () => void): () => void {
+    if (!isSupabaseConfigured) return () => undefined;
     this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    this.startRealtime();
+    return () => {
+      this.listeners.delete(listener);
+      if (!this.listeners.size && this.channel) {
+        void requireSupabase().removeChannel(this.channel);
+        this.channel = null;
+      }
+    };
   }
 
-  private read(): BookingSettings | null {
-    if (typeof window === 'undefined') return null;
-    try {
-      const raw = window.localStorage.getItem(this.storageKey);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw) as Partial<BookingSettings>;
-      if (!Number.isFinite(parsed.minimumNights)) return null;
-      return { minimumNights: Math.min(30, Math.max(1, Math.round(parsed.minimumNights as number))) };
-    } catch {
-      return null;
-    }
+  private startRealtime() {
+    if (this.channel) return;
+    this.channel = requireSupabase()
+      .channel('booking-settings-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'booking_settings' }, () => {
+        void this.getSettings().then(() => this.notify()).catch(() => this.notify());
+      })
+      .subscribe();
   }
-
-  private persist() {
-    if (typeof window !== 'undefined') window.localStorage.setItem(this.storageKey, JSON.stringify(this.settings));
-    this.notify();
-  }
-
-  private handleStorage = (event: StorageEvent) => {
-    if (event.key !== this.storageKey) return;
-    const next = this.read();
-    if (!next) return;
-    this.settings = next;
-    this.notify();
-  };
 
   private notify() {
     this.listeners.forEach((listener) => listener());

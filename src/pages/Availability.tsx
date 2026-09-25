@@ -14,7 +14,7 @@ export default function Availability() {
   const [minimumNights, setMinimumNights] = useState(2);
 
   useEffect(() => {
-    const refresh = () => bookingSettingsService.getSettings().then((settings) => setMinimumNights(settings.minimumNights));
+    const refresh = () => bookingSettingsService.getSettings().then((settings) => setMinimumNights(settings.minimumNights)).catch(() => undefined);
     void refresh();
     return bookingSettingsService.subscribe(refresh);
   }, []);

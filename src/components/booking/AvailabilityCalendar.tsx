@@ -43,6 +43,7 @@ export default function AvailabilityCalendar({
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(today));
   const [availability, setAvailability] = useState<Record<string, AvailabilityStatus>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [availabilityError, setAvailabilityError] = useState('');
 
   const visibleMonths = useMemo(
     () => Array.from({ length: monthsToShow }, (_, index) => addMonths(currentMonth, index)),
@@ -59,6 +60,14 @@ export default function AvailabilityCalendar({
       calendarService.getAvailability(rangeStart, rangeEnd).then((map) => {
         if (!active) return;
         setAvailability(map);
+        setAvailabilityError('');
+        setIsLoading(false);
+      }).catch((error: unknown) => {
+        if (!active) return;
+        const unavailable: Record<string, AvailabilityStatus> = {};
+        for (let day = rangeStart; day <= rangeEnd; day = addDays(day, 1)) unavailable[toDateKey(day)] = 'blocked';
+        setAvailability(unavailable);
+        setAvailabilityError(error instanceof Error ? error.message : 'Le calendrier est momentanément indisponible.');
         setIsLoading(false);
       });
     };
@@ -87,8 +96,12 @@ export default function AvailabilityCalendar({
 
     if (differenceInCalendarDays(day, selectedDates.from) < minimumNights) return;
 
-    const rangeIsAvailable = await calendarService.isRangeAvailable(selectedDates.from, day);
-    onDateSelect(rangeIsAvailable ? { from: selectedDates.from, to: day } : { from: day });
+    try {
+      const rangeIsAvailable = await calendarService.isRangeAvailable(selectedDates.from, day);
+      onDateSelect(rangeIsAvailable ? { from: selectedDates.from, to: day } : { from: day });
+    } catch (error) {
+      setAvailabilityError(error instanceof Error ? error.message : 'Impossible de vérifier ces dates.');
+    }
   };
 
   const renderMonth = (month: Date) => {
@@ -186,6 +199,8 @@ export default function AvailabilityCalendar({
           <ChevronRight size={21} />
         </button>
       </div>
+
+      {availabilityError && <p role="alert" className="mb-5 border border-red-200 bg-red-50 p-3 text-sm leading-relaxed text-red-800">Le calendrier ne peut pas vérifier les disponibilités. Les dates restent désactivées jusqu’au rétablissement de la connexion. {availabilityError}</p>}
 
       <div className={clsx('grid gap-8 lg:gap-12', monthsToShow === 2 && 'lg:grid-cols-2 lg:divide-x lg:divide-stone-100')}>
         {visibleMonths.map(renderMonth)}

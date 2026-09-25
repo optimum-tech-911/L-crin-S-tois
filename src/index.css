@@ -1,22 +1,25 @@
 @import "tailwindcss";
 
-/* L’Écrin Sétois brand gold — derived from the emblem’s sun and horizon line.
-   Existing accent utilities resolve through this palette so the whole product
-   keeps one consistent warm, Mediterranean identity. */
+/* Muted blues from the updated palette. Beige remains the main surface color;
+   blue accents stay concentrated on actions, links, and small details. */
 @theme {
-  --color-gold-50: #fffaf0;
-  --color-gold-100: #fdf2d8;
-  --color-gold-200: #f8dfaa;
-  --color-gold-300: #f0c978;
-  --color-gold-400: #e4b452;
-  --color-gold-500: #d29a32;
-  --color-gold-600: #b77d20;
-  --color-gold-700: #926119;
-  --color-gold-800: #704a14;
-  --color-gold-900: #50340f;
-  --color-gold-950: #2f1e09;
+  --color-gold-50: #f2f5f7;
+  --color-gold-100: #d9e2e8;
+  --color-gold-200: #c7d5e6;
+  --color-gold-300: #b0cadf;
+  --color-gold-400: #94bad4;
+  --color-gold-500: #6f98b9;
+  --color-gold-600: #4f6a96;
+  --color-gold-700: #2d467a;
+  --color-gold-800: #263d6b;
+  --color-gold-900: #22355d;
+  --color-gold-950: #1d2c4d;
 
-  /* Legacy orange utility names now render in the branded gold palette. */
+  /* Warm gold is a restrained secondary detail beside the blue palette. */
+  --color-champagne: #c5a86f;
+  --color-champagne-soft: #ddcca4;
+
+  /* Legacy orange utility names resolve to the same blue accent palette. */
   --color-orange-50: var(--color-gold-50);
   --color-orange-100: var(--color-gold-100);
   --color-orange-200: var(--color-gold-200);

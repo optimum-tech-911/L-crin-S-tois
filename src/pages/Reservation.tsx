@@ -23,7 +23,7 @@ export default function Reservation() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', country: '', guests: '1', message: '' });
 
   useEffect(() => {
-    const refresh = () => bookingSettingsService.getSettings().then((settings) => setMinimumNights(settings.minimumNights));
+    const refresh = () => bookingSettingsService.getSettings().then((settings) => setMinimumNights(settings.minimumNights)).catch(() => undefined);
     void refresh();
     return bookingSettingsService.subscribe(refresh);
   }, []);
@@ -34,6 +34,7 @@ export default function Reservation() {
 
     setIsSubmitting(true);
     setValidationError('');
+    try {
     const result = await bookingService.submitReservationRequest({
       checkIn: arrival,
       checkOut: departure,
@@ -48,6 +49,10 @@ export default function Reservation() {
     setIsSubmitting(false);
     if (result.success) setIsSubmitted(true);
     else setValidationError(result.message);
+    } catch (error) {
+      setValidationError(error instanceof Error ? error.message : 'Votre demande n’a pas pu être envoyée. Réessayez.');
+      setIsSubmitting(false);
+    }
   };
 
   return (

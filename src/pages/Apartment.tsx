@@ -86,7 +86,7 @@ export default function Apartment() {
             {propertyData.amenities.map((category, index) => {
               const Icon = amenityIcons[index] ?? Check;
               return <FadeIn key={category.category} delay={(index % 3) * 0.07} className="h-full">
-                <motion.article whileHover={{ y: -5 }} transition={{ type: 'spring', stiffness: 210, damping: 22 }} className="group h-full border border-stone-200 bg-[#faf9f6] p-6 transition-colors hover:border-gold-400 hover:bg-[#fffaf0] sm:p-7">
+                <motion.article whileHover={{ y: -5 }} transition={{ type: 'spring', stiffness: 210, damping: 22 }} className="group h-full border border-stone-200 bg-[#faf9f6] p-6 transition-colors hover:border-gold-400 hover:bg-[#f2f5f7] sm:p-7">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gold-300 bg-white text-gold-800 transition-transform duration-500 group-hover:rotate-6 group-hover:scale-105"><Icon size={22} strokeWidth={1.6} /></div>
                   <h3 className="mt-5 font-serif text-2xl text-stone-950">{category.category}</h3>
                   <ul className="mt-5 grid gap-2.5 text-sm text-stone-600">
@@ -115,7 +115,7 @@ export default function Apartment() {
                   >
                     <div className={`relative max-w-md bg-stone-50 py-7 ${isEven ? 'lg:pr-12' : 'lg:pl-12 lg:ml-auto'}`}>
                       <div className="relative z-10">
-                      <div className="mb-5 flex items-center gap-3"><div className="h-px w-10 bg-gold-500" aria-hidden="true" /><p className="text-xs font-bold uppercase tracking-[0.18em] text-gold-700">{section.eyebrow}</p></div>
+                      <div className="mb-5 flex items-center gap-3"><div className="h-px w-10 bg-champagne" aria-hidden="true" /><p className="text-xs font-bold uppercase tracking-[0.18em] text-gold-700">{section.eyebrow}</p></div>
                       <h2 className="mb-6 text-3xl font-serif text-stone-900 md:text-4xl">{section.title}</h2>
                       <p className="text-lg font-light leading-relaxed text-stone-600">
                         {section.description}

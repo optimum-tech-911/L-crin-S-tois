@@ -17,7 +17,7 @@ export default function SEO({
   description, 
   canonicalPath,
   ogType = 'website',
-  ogImage = '/og-l-ecrin-setois.jpg',
+  ogImage = '/og-l-ecrin-setois.jpg?v=2',
   noIndex = false,
   structuredData,
 }: SEOProps) {
@@ -40,8 +40,10 @@ export default function SEO({
       <meta property="og:type" content={ogType} />
       <meta property="og:url" content={fullUrl} />
       <meta property="og:image" content={imageUrl} />
+      <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content="Salon lumineux de L’Écrin Sétois, appartement de vacances à Sète" />
       <meta property="og:locale" content="fr_FR" />
       <meta property="og:site_name" content={siteData.name} />
       
@@ -49,6 +51,7 @@ export default function SEO({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={imageUrl} />
+      <meta name="twitter:image:alt" content="Salon lumineux de L’Écrin Sétois, appartement de vacances à Sète" />
 
       {jsonLd.map((data, index) => (
         <script key={`json-ld-${index}`} type="application/ld+json">{JSON.stringify(data)}</script>

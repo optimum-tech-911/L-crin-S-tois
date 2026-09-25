@@ -31,7 +31,7 @@ export default function Sete() {
       />
 
       <section className="relative overflow-hidden bg-stone-950 pb-16 pt-28 text-stone-50 md:pb-24 md:pt-36">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_15%,rgba(198,153,67,0.18),transparent_38%)]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_15%,rgba(148,186,212,0.13),transparent_38%)]" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 md:items-end lg:grid-cols-[0.76fr_1.24fr] lg:gap-0 lg:px-8">
           <FadeIn direction="right" className="relative z-10 lg:pb-12 lg:pr-16">
             <p className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-gold-300"><Compass size={16} /> La destination</p>
