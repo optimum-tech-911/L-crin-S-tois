@@ -82,7 +82,8 @@ export default function AvailabilityCalendar({
   }, [visibleMonths]);
 
   const selectDay = async (day: Date, status: AvailabilityStatus, isInMonth: boolean) => {
-    if (isLoading || !isInMonth || isBefore(day, today) || status !== 'available') return;
+    const canBeCheckout = Boolean(selectedDates.from && !selectedDates.to && isBefore(selectedDates.from, day));
+    if (isLoading || !isInMonth || isBefore(day, today) || (status !== 'available' && !canBeCheckout)) return;
 
     if (!selectedDates.from || selectedDates.to || isBefore(day, selectedDates.from)) {
       onDateSelect({ from: day });
@@ -97,7 +98,8 @@ export default function AvailabilityCalendar({
     if (differenceInCalendarDays(day, selectedDates.from) < minimumNights) return;
 
     try {
-      const rangeIsAvailable = await calendarService.isRangeAvailable(selectedDates.from, day);
+      // Checkout is exclusive: only nights before the checkout date must be free.
+      const rangeIsAvailable = await calendarService.isRangeAvailable(selectedDates.from, addDays(day, -1));
       onDateSelect(rangeIsAvailable ? { from: selectedDates.from, to: day } : { from: day });
     } catch (error) {
       setAvailabilityError(error instanceof Error ? error.message : 'Impossible de vérifier ces dates.');
@@ -131,6 +133,7 @@ export default function AvailabilityCalendar({
             const isPast = isBefore(day, today);
             const isStart = Boolean(selectedDates.from && isSameDay(day, selectedDates.from));
             const isEnd = Boolean(selectedDates.to && isSameDay(day, selectedDates.to));
+            const canBeCheckout = Boolean(selectedDates.from && !selectedDates.to && isBefore(selectedDates.from, day));
             const isBetween = Boolean(
               selectedDates.from && selectedDates.to && isBefore(selectedDates.from, day) && isBefore(day, selectedDates.to),
             );
@@ -147,13 +150,14 @@ export default function AvailabilityCalendar({
                 <button
                   type="button"
                   onClick={() => selectDay(day, status, isInMonth)}
-                  disabled={!isInMonth || isUnavailable || isTooShort || isLoading}
-                  aria-label={`${format(day, 'EEEE d MMMM yyyy', { locale: fr })}${isUnavailable ? ', indisponible' : isTooShort ? `, séjour minimum de ${minimumNights} nuits` : ''}`}
+                  disabled={!isInMonth || isPast || (isUnavailable && !canBeCheckout) || isTooShort || isLoading}
+                  aria-label={`${format(day, 'EEEE d MMMM yyyy', { locale: fr })}${isUnavailable ? canBeCheckout ? ', date possible de départ' : ', indisponible' : isTooShort ? `, séjour minimum de ${minimumNights} nuits` : ''}`}
                   className={clsx(
                     'relative flex h-10 w-10 items-center justify-center rounded-full text-sm transition-all duration-200 sm:h-11 sm:w-11',
                     !isInMonth && 'invisible',
                     isInMonth && !isUnavailable && !isStart && !isEnd && 'font-medium text-stone-800 hover:bg-orange-100 hover:text-orange-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-700',
-                    isUnavailable && isInMonth && 'cursor-not-allowed text-stone-300 line-through decoration-stone-300',
+                    isUnavailable && isInMonth && !canBeCheckout && 'cursor-not-allowed text-stone-300 line-through decoration-stone-300',
+                    isUnavailable && canBeCheckout && 'cursor-pointer font-medium text-stone-600 underline decoration-dotted underline-offset-4 hover:bg-stone-100',
                     isTooShort && isInMonth && !isUnavailable && 'cursor-not-allowed text-stone-300',
                     (isStart || isEnd) && 'bg-orange-800 font-bold text-stone-50 shadow-md ring-2 ring-orange-100',
                     isLoading && 'animate-pulse text-transparent',

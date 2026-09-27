@@ -3,7 +3,7 @@ import SEO from '../components/seo/SEO';
 import { propertyData } from '../data/property';
 import EditorialImageRotator from '../components/common/EditorialImageRotator';
 import HeroCarousel from '../components/common/HeroCarousel';
-import { heroImages, livingDiningImages, seteImages, bedroomImages, balconyImages } from '../data/images';
+import { heroImages, livingDiningImages, seteImages, bedroomImages, bathroomImages, kitchenImages, balconyImages } from '../data/images';
 import FadeIn from '../components/common/FadeIn';
 import { Link } from 'react-router-dom';
 import { pricingData } from '../data/pricing';
@@ -25,8 +25,8 @@ export default function Home() {
   return (
     <>
       <SEO 
-        title="Location de vacances à Sète | L’Écrin Sétois"
-        description={propertyData.shortDescription}
+        title="Hébergement à Sète | Appartement 2 étoiles | L’Écrin Sétois"
+        description="Alternative à l’hôtel à Sète : L’Écrin Sétois est un appartement de vacances classé meublé de tourisme 2 étoiles, avec chambre, cuisine et balcon."
         structuredData={[
           {
             '@context': 'https://schema.org',
@@ -44,10 +44,15 @@ export default function Home() {
           {
             '@context': 'https://schema.org',
             '@type': 'VacationRental',
+            '@id': `${siteData.url}/#hebergement`,
+            identifier: propertyData.id,
+            additionalType: 'Apartment',
             name: propertyData.name,
             description: propertyData.shortDescription,
             url: siteData.url,
-            image: [`${siteData.url}${heroImages[0].src}`],
+            image: [heroImages[0], ...livingDiningImages.slice(0, 2), ...bedroomImages.slice(0, 2), ...bathroomImages.slice(0, 2), kitchenImages[0], balconyImages[0]].map((photo) => `${siteData.url}${photo.src}`),
+            email: siteData.contactEmail,
+            starRating: { '@type': 'Rating', ratingValue: 2 },
             address: {
               '@type': 'PostalAddress',
               addressLocality: propertyData.location,
@@ -171,6 +176,7 @@ export default function Home() {
                 </div>
                 <div className="relative z-10 max-w-lg text-lg font-light leading-relaxed text-stone-600">
                   <p>{propertyData.longDescription}</p>
+                  <p className="mt-5">Vous cherchez un hôtel à Sète ? L’Écrin Sétois offre un séjour indépendant dans un appartement classé meublé de tourisme 2 étoiles.</p>
                 </div>
                 <div className="relative z-10 mt-12 inline-block">
                   <Link to="/appartement" className="group border-b border-gold-900 pb-1 text-sm font-medium uppercase tracking-widest text-gold-900 transition-colors hover:border-gold-600 hover:text-gold-600">

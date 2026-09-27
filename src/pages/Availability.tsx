@@ -7,14 +7,20 @@ import SEO from '../components/seo/SEO';
 import { propertyData } from '../data/property';
 import FadeIn from '../components/common/FadeIn';
 import AvailabilityCalendar, { SelectedDates } from '../components/booking/AvailabilityCalendar';
-import { bookingSettingsService } from '../services/bookingSettingsService';
+import { bookingSettingsService, DEFAULT_SETTINGS, minimumNightsForArrival } from '../services/bookingSettingsService';
 
 export default function Availability() {
   const [selectedDates, setSelectedDates] = useState<SelectedDates>({});
-  const [minimumNights, setMinimumNights] = useState(2);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settingsReady, setSettingsReady] = useState(false);
+  const [settingsError, setSettingsError] = useState('');
 
   useEffect(() => {
-    const refresh = () => bookingSettingsService.getSettings().then((settings) => setMinimumNights(settings.minimumNights)).catch(() => undefined);
+    const refresh = () => bookingSettingsService.getSettings().then((next) => {
+      setSettings(next);
+      setSettingsReady(true);
+      setSettingsError('');
+    }).catch(() => { setSettingsReady(false); setSettingsError('Impossible de charger les règles de séjour. Rechargez la page pour réessayer.'); });
     void refresh();
     return bookingSettingsService.subscribe(refresh);
   }, []);
@@ -22,7 +28,8 @@ export default function Availability() {
     () => selectedDates.from && selectedDates.to ? differenceInCalendarDays(selectedDates.to, selectedDates.from) : 0,
     [selectedDates],
   );
-  const selectionIsValid = Boolean(selectedDates.from && selectedDates.to && nights >= minimumNights);
+  const minimumNights = minimumNightsForArrival(settings, selectedDates.from ? format(selectedDates.from, 'yyyy-MM-dd') : undefined);
+  const selectionIsValid = Boolean(settingsReady && selectedDates.from && selectedDates.to && nights >= minimumNights);
   const reservationUrl = selectedDates.from && selectedDates.to
     ? `/reservation?arrival=${format(selectedDates.from, 'yyyy-MM-dd')}&departure=${format(selectedDates.to, 'yyyy-MM-dd')}`
     : '/reservation';
@@ -43,6 +50,7 @@ export default function Availability() {
 
           <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
             <FadeIn delay={0.1}>
+              {settingsError && <p role="alert" className="mb-4 border border-red-200 bg-red-50 p-4 text-sm text-red-800">{settingsError}</p>}
               <AvailabilityCalendar selectedDates={selectedDates} onDateSelect={setSelectedDates} minimumNights={minimumNights} />
             </FadeIn>
             <FadeIn delay={0.2} className="xl:sticky xl:top-24">
@@ -68,7 +76,7 @@ export default function Availability() {
                     Continuer ma réservation <ArrowRight size={18} />
                   </Link>
                 ) : (
-                  <div className="mt-8 min-h-14 border border-stone-700 px-5 py-4 text-center text-sm font-semibold text-stone-500">{selectedDates.to ? `Minimum ${minimumNights} nuits` : 'Choisissez vos deux dates'}</div>
+                  <div className="mt-8 min-h-14 border border-stone-700 px-5 py-4 text-center text-sm font-semibold text-stone-500">{!settingsReady ? 'Chargement des conditions…' : selectedDates.to ? `Minimum ${minimumNights} nuits` : 'Choisissez vos deux dates'}</div>
                 )}
                 <p className="mt-4 text-xs leading-relaxed text-stone-400">Cette étape ne confirme pas une réservation. Vous pourrez envoyer votre demande ensuite.</p>
                 <p className="mt-2 text-xs font-semibold text-orange-200">Durée minimum : {minimumNights} nuit{minimumNights > 1 ? 's' : ''}.</p>

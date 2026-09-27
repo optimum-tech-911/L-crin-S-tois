@@ -8,7 +8,7 @@ export const propertyData: PropertyData = {
   region: 'Hérault',
   country: 'France',
   tagline: 'Votre séjour à Sète.',
-  shortDescription: 'Appartement de vacances climatisé et rénové à Sète, avec chambre séparée, cuisine équipée, balcon, Wi-Fi et lave-linge.',
+  shortDescription: 'Meublé de tourisme classé 2 étoiles à Sète : appartement climatisé avec chambre séparée, cuisine équipée, balcon et Wi-Fi.',
   longDescription: "Lumineux, climatisé et entièrement rénové, L’Écrin Sétois réunit une chambre séparée, une cuisine complète et un balcon aménagé pour vivre Sète à pied, à votre rythme.",
   maxGuests: null,
   bedrooms: 1,

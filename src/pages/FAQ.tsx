@@ -21,7 +21,11 @@ const questions = [
   },
   {
     question: 'Quelle est la durée minimale du séjour ?',
-    answer: 'La durée minimale en vigueur est indiquée directement sous le calendrier des disponibilités. Elle est prise en compte automatiquement lors du choix des dates.',
+    answer: 'La durée minimale en vigueur est indiquée directement sous le calendrier des disponibilités. Elle peut varier selon la date d’arrivée et est prise en compte automatiquement lors du choix des dates.',
+  },
+  {
+    question: 'L’Écrin Sétois est-il un hôtel ?',
+    answer: 'L’Écrin Sétois est un appartement meublé de tourisme classé 2 étoiles, et non un hôtel. Il offre une alternative indépendante pour un séjour à Sète, avec cuisine équipée, chambre séparée et balcon.',
   },
   {
     question: 'Où stationner près de l’appartement ?',
