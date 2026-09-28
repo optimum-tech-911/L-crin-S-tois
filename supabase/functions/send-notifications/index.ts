@@ -4,39 +4,11 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const projectUrl = Deno.env.get('SUPABASE_URL');
 const secretKeys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}');
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || secretKeys.default;
-const resendKey = Deno.env.get('RESEND_API_KEY');
-const mailFrom = Deno.env.get('MAIL_FROM') || 'L Ecrin Setois <notifications@lecrinsetois.fr>';
 const mailTo = 'lecrinsetois@gmail.com';
-
-function plainText(job, record) {
-  const lines = job.kind === 'reservation'
-    ? [
-      'Nouvelle demande de réservation', '',
-      `Voyageur : ${record.first_name} ${record.last_name}`,
-      `Arrivée : ${record.check_in}`,
-      `Départ : ${record.check_out}`,
-      `Voyageurs : ${record.guests}`,
-      `Pays : ${record.country}`,
-    ]
-    : [
-      'Nouveau message de contact', '',
-      `Expéditeur : ${record.first_name} ${record.last_name}`,
-      `Sujet : ${record.subject}`,
-    ];
-  lines.push(`E-mail : ${record.email}`, `Téléphone : ${record.phone || 'Non renseigné'}`);
-  lines.push('', 'Message :', record.message || 'Aucun message ajouté.');
-  lines.push(
-    '',
-    'Ouvrir le site et consulter les demandes ou messages :',
-    'https://lecrinsetois.fr/admin',
-    'Connectez-vous avec un compte administrateur pour voir la fiche complète et assurer le suivi.',
-  );
-  return lines.join('\n');
-}
 
 Deno.serve(async (request) => {
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
-  if (!projectUrl || !serviceKey || !resendKey || !mailFrom) {
+  if (!projectUrl || !serviceKey) {
     return Response.json({ error: 'email_not_configured' }, { status: 503 });
   }
 
@@ -58,23 +30,44 @@ Deno.serve(async (request) => {
       const subject = job.kind === 'reservation'
         ? `Nouvelle demande de réservation — ${record.check_in} au ${record.check_out}`
         : `Nouveau contact — ${record.subject}`;
-      const response = await fetch('https://api.resend.com/emails', {
+      const formData = job.kind === 'reservation'
+        ? {
+          name: `${record.first_name} ${record.last_name}`,
+          email: record.email,
+          phone: record.phone || 'Non renseigné',
+          type: 'Demande de réservation',
+          arrival: record.check_in,
+          departure: record.check_out,
+          guests: record.guests,
+          country: record.country,
+          message: record.message || 'Aucun message ajouté.',
+          admin: 'https://lecrinsetois.fr/admin',
+        }
+        : {
+          name: `${record.first_name} ${record.last_name}`,
+          email: record.email,
+          phone: record.phone || 'Non renseigné',
+          type: 'Message de contact',
+          subject: record.subject,
+          message: record.message,
+          admin: 'https://lecrinsetois.fr/admin',
+        };
+      const response = await fetch(`https://formsubmit.co/ajax/${mailTo}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${resendKey}`,
           'Content-Type': 'application/json',
-          'Idempotency-Key': `lecrinsetois-${job.id}`,
+          Accept: 'application/json',
         },
         body: JSON.stringify({
-          from: mailFrom,
-          to: [mailTo],
-          reply_to: record.email,
-          subject,
-          text: plainText(job, record),
+          ...formData,
+          _replyto: record.email,
+          _subject: subject,
+          _template: 'table',
+          _url: `https://lecrinsetois.fr/${job.kind === 'reservation' ? 'disponibilites' : 'contact'}`,
         }),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || `Email provider returned ${response.status}`);
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success === false) throw new Error(result.message || `FormSubmit returned ${response.status}`);
       const { error: updateError } = await client.from('notification_jobs').update({
         sent_at: new Date().toISOString(),
         processing_at: null,
