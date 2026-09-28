@@ -25,7 +25,12 @@ function plainText(job, record) {
     ];
   lines.push(`E-mail : ${record.email}`, `Téléphone : ${record.phone || 'Non renseigné'}`);
   lines.push('', 'Message :', record.message || 'Aucun message ajouté.');
-  lines.push('', 'Retrouvez la demande dans l’administration du site.');
+  lines.push(
+    '',
+    'Ouvrir le site et consulter les demandes ou messages :',
+    'https://lecrinsetois.fr/admin',
+    'Connectez-vous avec un compte administrateur pour voir la fiche complète et assurer le suivi.',
+  );
   return lines.join('\n');
 }
 
