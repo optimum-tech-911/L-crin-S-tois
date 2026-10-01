@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import Header from './Header';
 import Footer from './Footer';
 import StickyBookingBar from '../booking/StickyBookingBar';
-import FlashNotification from './FlashNotification';
 import ScrollProgress from '../common/ScrollProgress';
 
 export default function Layout() {
@@ -29,7 +28,6 @@ export default function Layout() {
       </main>
       <Footer />
       <StickyBookingBar />
-      <FlashNotification />
     </div>
   );
 }

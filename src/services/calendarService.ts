@@ -1,4 +1,4 @@
-import { addDays, endOfWeek, format, startOfDay } from 'date-fns';
+import { addDays, format, startOfDay } from 'date-fns';
 import { isSupabaseConfigured, requireSupabase } from '../lib/supabase';
 
 export type AvailabilityStatus = 'available' | 'booked' | 'blocked' | 'pending';
@@ -8,11 +8,6 @@ export interface AvailabilityRange {
   start: string;
   end: string;
   status: Exclude<AvailabilityStatus, 'available'>;
-}
-
-export interface AvailabilityNotice {
-  title: string;
-  message: string;
 }
 
 export const toDateKey = (date: Date) => format(date, 'yyyy-MM-dd');
@@ -77,16 +72,6 @@ export class CalendarService {
       day = addDays(day, 1);
     }
     return true;
-  }
-
-  async getAvailabilityNotice(referenceDate = new Date()): Promise<AvailabilityNotice | null> {
-    try {
-      const today = startOfDay(referenceDate);
-      const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
-      const availability = await this.getAvailability(today, weekEnd);
-      const hasAvailableDay = Object.values(availability).some((status) => status === 'available');
-      return hasAvailableDay ? { title: 'Disponibilités', message: 'Des disponibilités cette semaine !' } : null;
-    } catch { return null; }
   }
 
   async setAvailabilityRange(range: AvailabilityRange): Promise<void> {

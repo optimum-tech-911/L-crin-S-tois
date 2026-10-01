@@ -22,7 +22,7 @@ export const propertyData: PropertyData = {
     },
     {
       category: 'Confort',
-      items: ['Climatisation', 'Wi-Fi gratuit', 'Machine à laver', 'Nécessaire de repassage'],
+      items: ['Climatisation', 'Wi-Fi gratuit', 'Machine à laver', 'Nécessaire de repassage', 'Linge de maison à disposition', 'Serviettes de toilette', 'Draps de lit'],
     },
     {
       category: 'Salon & divertissement',
