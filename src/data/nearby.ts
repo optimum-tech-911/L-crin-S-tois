@@ -79,8 +79,8 @@ export const saintClairWalk = {
   walkingTime: 'env. 35 min',
   distance: 'env. 1,9 km',
   elevation: 'env. 176 m D+',
-  description: 'Une montée sportive depuis l’appartement, en passant par les célèbres escaliers de Saint-Clair, récompensée par un vaste panorama sur Sète, l’étang de Thau et la Méditerranée.',
-  website: 'https://www.tourisme-sete.com/medias/documents/Itineraires_pedestres_St_Clair/Itineraire_pedestre_2.pdf',
+  description: 'Une montée sportive depuis le quai de Bosc, en passant par les célèbres escaliers de Saint-Clair, récompensée par un vaste panorama sur Sète, l’étang de Thau et la Méditerranée.',
+  website: 'https://www.google.com/maps/dir/?api=1&origin=Quai+de+Bosc%2C+S%C3%A8te%2C+France&destination=Chapelle+Notre-Dame+de+la+Salette%2C+S%C3%A8te%2C+France&travelmode=walking',
 };
 
 export const parkingTips = [

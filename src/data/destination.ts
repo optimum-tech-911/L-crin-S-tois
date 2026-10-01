@@ -37,8 +37,8 @@ export const cityMoments: CityMoment[] = [
     description: 'Le mont Saint-Clair culmine à environ 175 mètres et offre une lecture unique de la ville : l’étang de Thau d’un côté, les toits, les canaux et la Méditerranée de l’autre.',
     image: '/optimized-images/sete-mont.jpg',
     imageAlt: 'Panorama de Sète, de l’étang de Thau et de la Méditerranée depuis le mont Saint-Clair',
-    link: 'https://www.tourisme-sete.com/medias/documents/Itineraires_pedestres_St_Clair/Itineraire_pedestre_2.pdf',
-    linkLabel: 'Voir l’itinéraire officiel',
+    link: 'https://www.google.com/maps/dir/?api=1&origin=Quai+de+Bosc%2C+S%C3%A8te%2C+France&destination=Chapelle+Notre-Dame+de+la+Salette%2C+S%C3%A8te%2C+France&travelmode=walking',
+    linkLabel: 'Voir l’itinéraire sur Google Maps',
   },
   {
     id: 'lido',

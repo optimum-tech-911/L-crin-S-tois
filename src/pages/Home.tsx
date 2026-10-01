@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom';
 import { pricingData } from '../data/pricing';
 import { siteData } from '../data/site';
 import { motion } from 'motion/react';
-import InfiniteMarquee from '../components/common/InfiniteMarquee';
 import ReviewsSection from '../components/common/ReviewsSection';
 import { ArrowUpRight, ChevronDown, Images } from 'lucide-react';
 
@@ -116,8 +115,6 @@ export default function Home() {
           <ChevronDown size={32} />
         </motion.div>
       </section>
-
-      <InfiniteMarquee />
 
       {/* QUICK BOOKING BAR */}
       <section className="bg-orange-900 text-stone-50 py-6 border-b border-orange-950 relative overflow-hidden">
